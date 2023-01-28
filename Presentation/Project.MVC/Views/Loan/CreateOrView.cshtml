@@ -195,7 +195,10 @@
               invoices : invoicesContainer.invoices
          };
 
-         console.log(model)
+        if(!ValidateDataForIssueLoan(model)){
+             alert("Check the data!");
+            return;
+        }
 
          $.ajax
          ({
@@ -206,13 +209,17 @@
            success: function(result)
            {
                if(result.success === false){
-                   alert("Something went wrong ceck the data!");
+                   alert("Check the data!");
                     return;
                }
 
-              window.location = "/Index/";
+              window.location.href = "/Index/";
            } 
          });
+    }
+
+     function ValidateDataForIssueLoan(data){
+        return !(data.amount < 100 || data.amount > 5000)
     }
 
     function CalculateAndGetInvoices() {
