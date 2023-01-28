@@ -36,13 +36,9 @@ namespace Project.MVC.Controllers
         }
 
         [HttpPost]
-        public IActionResult IssueLoan([FromBody] CreateInvoiceViewModel model)
+        [ModelStateControl]
+        public IActionResult IssueLoan([FromBody] CreateLoanViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var result = _loanService.IssueLoan(model);
 
             if (!result.Success)

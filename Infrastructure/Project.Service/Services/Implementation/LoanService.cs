@@ -161,7 +161,7 @@ namespace Project.Service.Services.Implementation
             return (double)((loanAmount * (decimal)interestRate) / 100) * loanPeriod;
         }
 
-        public Result IssueLoan(CreateInvoiceViewModel model)
+        public Result IssueLoan(CreateLoanViewModel model)
         {
             var result = new Result();
 
@@ -216,6 +216,40 @@ namespace Project.Service.Services.Implementation
             return result;
         }
 
+        public Result IssueLoanFromExternal(CreateLoanViewModel model)
+        {
+            var result = new Result();
+
+            try
+            {
+                var invoicesResult = CalculateInvoices(new CalculateInvoicesViewModel()
+                {
+                    InterestRate = (int)model.Interest,
+                    LoanAmount = int.Parse(model.Amount),
+                    LoanPayOutDate = model.PayOutDate,
+                    LoanPeriod = model.Period
+                });
+
+                if(!invoicesResult.Success)
+                {
+                    result.Success =false;
+                    result.Error = invoicesResult.Error;
+                    return result;
+                }
+
+                var invoices = ((GetCalculatedInvoicesViewModel)invoicesResult.Data).Invoices;
+                model.Invoices = invoices;
+                result = IssueLoan(model);
+            }
+            catch (Exception ex)
+            {
+                result.Error = ex.Message;
+                result.Success = false;
+            }
+
+            return result;
+        }
+
         private Invoice InvoiceViewModelToInvoice(InvoiceViewModel invoice)
         {
             return new Invoice()
@@ -228,7 +262,7 @@ namespace Project.Service.Services.Implementation
             };
         }
 
-        private Loan CreateInvoiceViewModelToLoan(CreateInvoiceViewModel model)
+        private Loan CreateInvoiceViewModelToLoan(CreateLoanViewModel model)
         {
             return new Loan
             {

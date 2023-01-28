@@ -220,7 +220,7 @@
                     return;
                }
 
-              window.href = "/Index";
+              window.location.href = "Index/";
            } 
          });
     }
@@ -303,14 +303,17 @@
                                       let order = 1;
 
         for (let invoice of invoicesModel.invoices) {
+            let payDate = new Date(invoice.payDate);
+            let formattedDate = GetFormattedDate(payDate);
+
             html += `<tr>
                                                 <td>`+ order +`</td>
                                                 <td>`+ invoice.invoiceNr +`</td>
-                                                <td>`+ invoice.payDate +`</td>
+                                                <td>`+ formattedDate +`</td>
                                                 <td>`+  invoice.payment +`</td>
                                             </tr>
                                             <input type=hidden id='invoiceNr' value=` +invoice.invoiceNr +`/>
-                                            <input type=hidden id='payDate' value=` +invoice.payDate +`/>
+                                             <input type=hidden id='payDate' value=` + formattedDate + `/>
                                             <input type=hidden id='payment' value=` +invoice.payment +`/>
                                             <input type=hidden id='period' value=` +invoice.period +`/>
                                             <input type=hidden id='currentBalance' value=` +invoice.currentBalance +`/>
@@ -350,6 +353,18 @@
 
     return validDateFormatForJs;
 }
+
+    function GetFormattedDate(date) {
+        var year = date.getFullYear();
+
+        var month = (1 + date.getMonth()).toString();
+        month = month.length > 1 ? month : '0' + month;
+
+        var day = date.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+
+        return month + '/' + day + '/' + year;
+    }
 
 
 </script>

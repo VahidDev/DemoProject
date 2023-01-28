@@ -10,6 +10,7 @@ namespace Project.Service.Services.Abstraction
         Result CalculateInvoices(CalculateInvoicesViewModel model);
         ICollection<SP_GetLoan> GetAllLoansInfo();
         LoanDetailsViewModel GetLoanDetails(int? id);
-        Result IssueLoan(CreateInvoiceViewModel model);
+        Result IssueLoan(CreateLoanViewModel model);
+        Result IssueLoanFromExternal(CreateLoanViewModel model);
     }
 }

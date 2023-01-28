@@ -16,9 +16,10 @@ namespace Project.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult IssueLoan([FromBody] CreateInvoiceViewModel model)
+        [ModelStateControl]
+        public IActionResult IssueLoan([FromBody] CreateLoanViewModel model)
         {
-            var result = _loanService.IssueLoan(model);
+            var result = _loanService.IssueLoanFromExternal(model);
             return new ObjectResult(result);
         }
     }
