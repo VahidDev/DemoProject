@@ -205,8 +205,8 @@
          };
 
          console.log(model)
-        if(!ValidateDataForIssueLoan(model)){
-             alert("Check the data!");
+        if (!ValidateAmount(model.amount {
+             alert("Amount date needs to be between 100 and 5000!");
             return;
         }
 
@@ -228,8 +228,8 @@
          });
     }
 
-     function ValidateDataForIssueLoan(data){
-        return !(data.amount < 100 || data.amount > 5000)
+     function ValidateAmount(data.amount){
+        return !(amount < 100 || amount > 5000)
     }
 
     function CalculateAndGetInvoices() {
