@@ -1,0 +1,62 @@
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+
+# Visual Studio Code
+.vscode
+
+# Rider
+.idea
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio 2019
+.vs/
+
+# NuGet Packages
+*.nupkg
+# NuGet Symbol Packages
+*.snupkg
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target.
+!**/[Pp]ackages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/[Pp]ackages/repositories.config
+# NuGet v3's project.json files produces more ignorable files
+*.nuget.props
+*.nuget.targets
+
+/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/login.min.js
+/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/ui.min.js
+/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/jquery.min.js
+/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/login.bundle.js
+/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/ui.bundle.js
+/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/jquery.bundle.js
+/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/site.min.js
+/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/css/stylesmin.css
+wwwroot/js/*.min.js
+/EBSS.Web/EBSS.Web.CIM/wwwroot/js/*.bundle.js

@@ -1,0 +1,322 @@
+﻿  <!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Loan Details</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+@model LoanDetailsViewModel
+
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <!-- Main row -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Loan Details</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form>
+                <div class="card-body">
+                  <div class="form-group">
+                      <label>Client</label>
+                      @if (Model.Id.HasValue)
+                      {
+                          <select class="form-control" disabled>
+                            <option>@Model.LoanDetails.Client</option>
+                          </select>
+                      }else
+                      {
+                          <select class="form-control" id="clients">
+                              <option value="-1">Select a client</option>
+                              @foreach(var client in Model.ClientsComboBox)
+                              {
+                                  <option value="@client.Key">@client.Value</option>
+                              }
+                              </select>
+                      }
+                  </div>
+                  <div class="form-group">
+                      <label asp-for="LoanDetails.ClientPhone">Telephone number</label>
+                      <input class="form-control" value="@Model.LoanDetails.ClientPhone" asp-for="LoanDetails.ClientPhone">
+                  </div>
+                   <div class="form-group">
+                       <label asp-for="LoanDetails.LoanAmount">Loan Amount</label>
+                       <input class="form-control" value="@Model.LoanDetails.LoanAmount" asp-for="LoanDetails.LoanAmount">
+                  </div>
+                   <div class="form-group">
+                       <label asp-for="LoanDetails.LoanAmount">Loan period (months)</label>
+                       @if (Model.Id.HasValue)
+                       {
+                           <select class="form-control" asp-for="LoanDetails.LoanPeriod" disabled>
+                               <option>@Model.LoanDetails.LoanPeriod</option>
+                           </select>
+                       }
+                       else
+                       {
+                           <select class="form-control" asp-for="LoanDetails.LoanPeriod">
+                               <option value="-1">Choose Period</option>
+                               @foreach(var loanMonth in Model.LoanMonthsCombo)
+                               {
+                                   <option value="@loanMonth">@loanMonth</option>
+                               }
+                               </select>
+                       }    
+                  </div>
+                  <div class="form-group">
+                      <label asp-for="LoanDetails.InterestRate">Monthly Interest Rate %</label>
+                      <input class="form-control" value="@Model.LoanDetails.LoanAmount" asp-for="LoanDetails.InterestRate">
+                  </div>
+                   <div class="form-group">
+                       <label asp-for="LoanDetails.PayoutDate">Payout Date</label>
+                       <input type="date" class="form-control" asp-for="LoanDetails.PayoutDate">
+                  </div>
+                  <a class="btn btn-success float-right" id="calculateInvoicesBtn">Calculate Invoices</a>
+                </div>
+                <!-- /.card-body -->
+                
+                <section id="invocesSection">
+                @if (Model.Id.HasValue)
+                {
+                      <div class="col-md-6 px-2">
+                      <label>Invoices:</label>
+                       <div class="row">
+                           <div class="col-12">
+                               <div class="card-body">
+                                   <table id="example2" class="table table-bordered table-hover">
+                                       <thead>
+                                          <tr>
+                                              <th>#</th>
+                                              <th>Invoice No</th>
+                                              <th>Due Date</th>
+                                              <th>Amount</th>
+                                          </tr>
+                                       </thead>
+                                      <tbody>
+                                        @foreach(var invoice in Model.Invoices)
+                                        {
+                                            <tr>
+                                                <td>@invoice.Order</td>
+                                                <td>@invoice.InvoiceNr</td>
+                                                <td>@invoice.InvoiceDate</td>
+                                                <td>@invoice.Amount</td>
+                                            </tr>
+                                        }
+                                      </tbody>
+                                   </table>
+                               </div>
+                           </div>
+                       </div>
+                       <div class="form-group d-flex justify-content-between align-items-center">
+                           <label>Total Interest </label>
+                           <input id="loanInterest" value="@Model.TotalInterest" disabled>
+                       </div>
+                  </div>
+                  }
+                  </section>
+                        <div class="card-footer d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary mx-3" id="issueLoanBtn">Issue loan</button>
+                            <a asp-action="Index" class="btn btn-danger" id="cancelBtn" >Cancel</a>
+                        </div>
+                  </form>
+                  </div>
+          </div>
+        </div>
+        <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<script>
+    $(document).ready(function () 
+    {
+        const phoneInputId = '@Html.IdFor(m=>m.LoanDetails.ClientPhone)';
+        const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
+        const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
+        const payOutInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
+        const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
+        const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
+        const payputDate = '@Model.LoanDetails.PayoutDate';
+
+        @if (Model.Id.HasValue)
+        {
+                <text>
+                DisableAllFields(phoneInputId,loanAmountInputId,interestRateInputId,payOutInputId)
+                ("#" + loanPayOutDateInputId).value = payputDate
+                </text>
+        }
+
+        let invoices = null;
+
+        document.getElementById("issueLoanBtn").addEventListener("click",function(e){
+            CalculateInvoices(invoices);
+        })
+
+        document.getElementById("calculateInvoicesBtn").addEventListener("click",function(e){
+            IssueLoan(invoices);
+        })
+    });
+
+    function DisableAllFields(phoneInputId,loanAmountInputId,interestRateInputId,payOutInputId) {
+        $("#" + phoneInputId).attr('disabled', 'disabled');
+        $("#" + loanAmountInputId).attr('disabled', 'disabled');
+        $("#" + interestRateInputId).attr('disabled', 'disabled');
+        $("#" + payOutInputId).attr('disabled', 'disabled');
+        $("#issueLoanBtn").hide();
+        $("#calculateInvoicesBtn").hide();
+    }
+
+      function IssueLoan(invoices) {
+
+        const phoneInputId = '@Html.IdFor(m=>m.LoanDetails.ClientPhone)';
+        const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
+        const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
+        const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
+        const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
+        const clientInputId = '@Html.IdFor(m=>m.ClientsComboBox)';
+
+        console.log($("#" + loanPayOutDateInputId).val())
+         var data = {
+              client:  $("#clients").val(),
+              phone:    $("#" + phoneInputId).val(),
+              Amount:  $("#" + loanAmountInputId).val(),
+              Period:  $("#" + loanPeriodInputId.val(),
+              PayOutDate:  $("#" + loanPayOutDateInputId).val(),
+              invoices : invoices
+         };
+
+         if(!ValidateData(data)){
+             alert("Fill all the inputs and make sure that they are valid!")
+             return;
+         }
+
+         $.ajax
+         ({
+           type: "POST",
+           contentType: "application/json; charset=utf-8",
+           url: "/Loan/CalculateInvoices",
+           data: JSON.stringify(data),
+           success: function(result)
+           {
+               if(result.success === false){
+                   alert("Something went wrong ceck the data!");
+                    return;
+               }
+
+               PlaceInvoices(result.data);
+
+               console.log(result)
+           } 
+         });
+    }
+
+    function CalculateInvoices(invoicesData) {
+
+        const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
+        const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
+        const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
+        const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
+
+        console.log($("#" + loanPayOutDateInputId).val())
+         var data = {
+              loanAmount:  $("#" + loanAmountInputId).val(),
+              interestRate:    $("#" + interestRateInputId).val(),
+              loanPeriod:  $("#" + loanPeriodInputId).val(),
+              loanPayOutDate:  $("#" + loanPayOutDateInputId).val()
+         };
+
+         if(!ValidateData(data)){
+             alert("Fill all the inputs and make sure that they are valid!")
+             return;
+         }
+
+         $.ajax
+         ({
+           type: "POST",
+           contentType: "application/json; charset=utf-8",
+           url: "/Loan/CalculateInvoices",
+           data: JSON.stringify(data),
+           success: function(result)
+           {
+               if(result.success === false){
+                   alert("Something went wrong ceck the data!");
+                    return;
+               }
+
+               PlaceInvoices(result.data);
+               invoicesData = result.data;
+           } 
+         });
+    }
+
+    function ValidateData(data){
+        return !(data.loanAmount === null || data.loanAmount === 0 || 
+                data.loanPayOutDate === null || data.loanPayOutDate === '' ||
+                data.loanPeriod === -1 || 
+                data.interestRate == null || data.interestRate == 0)
+    }
+
+    function PlaceInvoices(invoicesModel){
+
+        const invoicesSection = document.getElementById("invocesSection");
+        let html = `<div class="col-md-6 px-2">
+                      <label>Invoices:</label>
+                       <div class="row">
+                           <div class="col-12">
+                               <div class="card-body">
+                                   <table id="example2" class="table table-bordered table-hover">
+                                       <thead>
+                                          <tr>
+                                              <th>#</th>
+                                              <th>Invoice No</th>
+                                              <th>Due Date</th>
+                                              <th>Amount</th>
+                                          </tr>
+                                       </thead>
+                                      <tbody>`;
+                                      let order = 1;
+
+        for (let invoice of invoicesModel.invoices) {
+            html += `<tr>
+                                                <td>`+ order +`</td>
+                                                <td>`+ invoice.invoiceNr +`</td>
+                                                <td>`+ invoice.payDate +`</td>
+                                                <td>`+  invoice.payment +`</td>
+                                            </tr>
+                                            <input type=hidden id='invoiceNr' value=` +invoice.invoiceNr +`/>
+                                            <input type=hidden id='payDate' value=` +invoice.payDate +`/>
+                                            <input type=hidden id='payment' value=` +invoice.payment +`/>
+                                            <input type=hidden id='period' value=` +invoice.period +`/>
+                                            <input type=hidden id='currentBalance' value=` +invoice.currentBalance +`/>
+                                            <input type=hidden id='interest' value=` +invoice.interest +`/>
+                                            <input type=hidden id='principal' value=` +invoice.principal +`/>
+                                            
+                                            `
+
+                                            order++;
+        }
+
+        html += `</tbody>
+                                   </table>
+                               </div>
+                           </div>
+                       </div>
+                       <div class="form-group d-flex justify-content-between align-items-center">
+                           <label>Total Interest </label>
+                           <input id="loanInterest" value="`+ invoicesModel.totalInterest +`" disabled>
+                       </div>
+                  </div>`;
+
+        invoicesSection.innerHTML = html;
+    }
+</script>

@@ -1,0 +1,9 @@
+﻿{
+  "AppDbConnectionModel": {
+    "serverName": "DEVMONSTER",
+    "database": "TestProAteshgahDb",
+    "username": null,
+    "password": null,
+    "trustedConnection": true
+  }
+}

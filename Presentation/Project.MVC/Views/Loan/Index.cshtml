@@ -1,0 +1,66 @@
+﻿@model ICollection<SP_GetLoan>
+
+  <!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">List</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Form</a></li>
+                    <li class="breadcrumb-item active">Loan Information List</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-lg-3 col-6">
+            </div>
+        </div>
+        <!-- /.row -->
+        <!-- Main row -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card-body">
+                    <a class="btn btn-primary float-right my-4" asp-action="CreateOrView">New Loan</a>
+                    <table id="example2" class="table table-bordered table-hover">
+                      <thead>
+                      <tr>
+                          <th>Client ID</th>
+                          <th>Client</th>
+                          <th>Loan Amount</th>
+                          <th>Payout date</th>
+                        </tr>
+                          </thead>
+                          <tbody>
+                            @foreach(var loanInfo in Model)
+                            {
+                                <tr>
+                                    <td>@loanInfo.ClientId</td>
+                                    <td>@loanInfo.ClientName</td>
+                                    <td>@loanInfo.LoanAmount</td>
+                                    <td>@loanInfo.PayoutDate</td>
+                                    <td>
+                                        <a type="button" asp-action="CreateOrView" asp-route-id="@loanInfo.LoanId" class="btn btn-warning">
+                                            <i class="fas fa-edit"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                          </tbody>
+                </table>
+              </div>
+            </div>
+        </div>
+        <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
