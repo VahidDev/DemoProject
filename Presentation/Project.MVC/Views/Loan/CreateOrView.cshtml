@@ -125,7 +125,7 @@
                   }
                   </section>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary mx-3" id="issueLoanBtn">Issue loan</button>
+                            <button class="btn btn-primary mx-3" id="issueLoanBtn" disabled>Issue loan</button>
                             <a asp-action="Index" class="btn btn-danger" id="cancelBtn" >Cancel</a>
                         </div>
                   </form>
@@ -138,6 +138,9 @@
 <!-- /.content -->
 
 <script>
+
+    var invoicesContainer = null;
+
     $(document).ready(function () 
     {
         const phoneInputId = '@Html.IdFor(m=>m.LoanDetails.ClientPhone)';
@@ -156,14 +159,12 @@
                 </text>
         }
 
-        let invoices = null;
-
         document.getElementById("issueLoanBtn").addEventListener("click",function(e){
-            CalculateInvoices(invoices);
+            IssueLoan();
         })
 
         document.getElementById("calculateInvoicesBtn").addEventListener("click",function(e){
-            IssueLoan(invoices);
+            CalculateAndGetInvoices();
         })
     });
 
@@ -176,7 +177,7 @@
         $("#calculateInvoicesBtn").hide();
     }
 
-      function IssueLoan(invoices) {
+      function IssueLoan() {
 
         const phoneInputId = '@Html.IdFor(m=>m.LoanDetails.ClientPhone)';
         const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
@@ -185,27 +186,23 @@
         const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
         const clientInputId = '@Html.IdFor(m=>m.ClientsComboBox)';
 
-        console.log($("#" + loanPayOutDateInputId).val())
-         var data = {
-              client:  $("#clients").val(),
+         let model = {
+              client:  Number($("#clients").val()),
               phone:    $("#" + phoneInputId).val(),
-              Amount:  $("#" + loanAmountInputId).val(),
-              Period:  $("#" + loanPeriodInputId.val(),
-              PayOutDate:  $("#" + loanPayOutDateInputId).val(),
-              invoices : invoices
+              amount:  $("#" + loanAmountInputId).val(),
+              period:  Number($("#" + loanPeriodInputId).val()),
+              payOutDate:  $("#" + loanPayOutDateInputId).val(),
+              invoices : invoicesContainer.invoices
          };
 
-         if(!ValidateData(data)){
-             alert("Fill all the inputs and make sure that they are valid!")
-             return;
-         }
+         console.log(model)
 
          $.ajax
          ({
            type: "POST",
            contentType: "application/json; charset=utf-8",
-           url: "/Loan/CalculateInvoices",
-           data: JSON.stringify(data),
+           url: "/Loan/IssueLoan",
+           data: JSON.stringify(model),
            success: function(result)
            {
                if(result.success === false){
@@ -213,22 +210,19 @@
                     return;
                }
 
-               PlaceInvoices(result.data);
-
-               console.log(result)
+              window.location = "/Index/";
            } 
          });
     }
 
-    function CalculateInvoices(invoicesData) {
+    function CalculateAndGetInvoices() {
 
         const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
         const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
         const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
         const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
 
-        console.log($("#" + loanPayOutDateInputId).val())
-         var data = {
+         let data = {
               loanAmount:  $("#" + loanAmountInputId).val(),
               interestRate:    $("#" + interestRateInputId).val(),
               loanPeriod:  $("#" + loanPeriodInputId).val(),
@@ -250,11 +244,14 @@
            {
                if(result.success === false){
                    alert("Something went wrong ceck the data!");
-                    return;
+                    return null;
                }
 
                PlaceInvoices(result.data);
-               invoicesData = result.data;
+
+               $("#issueLoanBtn").removeAttr("disabled");
+
+               invoicesContainer = result.data;
            } 
          });
     }

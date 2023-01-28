@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Project.Service.Services.Abstraction;
 using Project.Service.ViewModels;
+using Project.Service.ViewModels.Invoice;
 
 namespace Project.MVC.Controllers
 {
@@ -35,9 +36,13 @@ namespace Project.MVC.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult IssueLoan([FromBody] CalculateInvoicesViewModel model)
+        public IActionResult IssueLoan([FromBody] CreateInvoiceViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = _loanService.IssueLoan(model);
 
             if (!result.Success)

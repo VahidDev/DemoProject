@@ -6,13 +6,17 @@ using System.Linq.Expressions;
 
 namespace Project.Infrastructure.Repositories.Implementation
 {
-    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> 
+        where TEntity : class
     {
+        private readonly AppDbContext _dbContext;
+
         protected DbSet<TEntity> DbSet { get; set; }
 
         public GenericRepository(AppDbContext dbContext)
         {
             DbSet = dbContext.Set<TEntity>();
+            _dbContext = dbContext;
         }
 
         public Result Add(TEntity item)
@@ -22,6 +26,7 @@ namespace Project.Infrastructure.Repositories.Implementation
             try
             {
                 DbSet.Add(item);
+                _dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -54,6 +59,25 @@ namespace Project.Infrastructure.Repositories.Implementation
             try
             {
                 DbSet.Update(item);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Error = ex.Message;
+            }
+
+            return result;
+        }
+
+        public Result AddRange(ICollection<TEntity> items)
+        {
+            var result = new Result();
+
+            try
+            {
+                DbSet.AddRange(items);
+                _dbContext.SaveChanges();
             }
             catch (Exception ex)
             {

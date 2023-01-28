@@ -45,7 +45,8 @@ namespace Project.Service.Services.Implementation
 
                 var calculatedInvoicesViewModel = new GetCalculatedInvoicesViewModel();
 
-                calculatedInvoicesViewModel.TotalInterest = CalculateTotalInterest(model.InterestRate, model.LoanPeriod, model.LoanAmount);
+                var totalInterest = CalculateTotalInterest(model.InterestRate, model.LoanPeriod, model.LoanAmount);
+                calculatedInvoicesViewModel.TotalInterest = Math.Round(totalInterest,2);
 
                 var latestInvoice = EfDbTools.ExecuteProcedure<SP_KeyValueResult>
                     ("dbo.SP_GetLastInvoice", null).FirstOrDefault();
@@ -63,7 +64,7 @@ namespace Project.Service.Services.Implementation
                     var invoiceModel = SP_GetInvoiceToInvoiceViewModel(invoice);
                     latestInvoiceNumber ++;
 
-                    invoiceModel.InvoiceNr = GenerateInvoiceNumber(latestInvoiceNumber);
+                    invoiceModel.InvoiceNr = GenerateNumber(latestInvoiceNumber);
 
                     invoices.Add(invoiceModel);
                 }
@@ -94,9 +95,9 @@ namespace Project.Service.Services.Implementation
             };
         }
 
-        public static string GenerateInvoiceNumber(int currentInvoiceNumber)
+        public static string GenerateNumber(int currentNumber)
         {
-            return currentInvoiceNumber.ToString().PadLeft(4, '0');
+            return currentNumber.ToString().PadLeft(4, '0');
         }
 
         public ICollection<SP_GetLoan> GetAllLoansInfo()
@@ -166,8 +167,44 @@ namespace Project.Service.Services.Implementation
 
             try
             {
+                var lastOrder = EfDbTools.ExecuteProcedure<SP_KeyValueResult>
+                 ("dbo.SP_GetLastOrder", null).FirstOrDefault();
+
+                var lastNumber = 0;
+
+                if (lastOrder != null)
+                {
+                    lastNumber = int.Parse(lastOrder.Value);
+                }
+
+                var newOrder = new Order() {
+                    Amount = decimal.Parse(model.Amount), 
+                    OrderDate = DateTime.Now, 
+                    ClientId = model.Client.ToString(),
+                    OrderNr = GenerateNumber(lastNumber),
+                    TrDate= DateTime.Now,
+                };
+
+                _orderRepository.Add(newOrder);
+
                 var loan = CreateInvoiceViewModelToLoan(model);
-                var newOrder = new Order() { Amount = (decimal)model.Amount, OrderDate = DateTime.Now, ClientId = model.Client.ToString()};
+                loan.OrderNr = newOrder.OrderNr;
+
+                var invoices = new List<Invoice>();
+
+                foreach (var invoice in model.Invoices)
+                {
+                    Invoice newInvoice = InvoiceViewModelToInvoice(invoice);
+                    newInvoice.OrderNr = newOrder.OrderNr;
+                    invoices.Add(newInvoice);
+                }
+
+                _invoiceRepository.AddRange(invoices);  
+
+                loan.PrincipialAmount = model.Invoices.Sum(r => r.Principal);
+                loan.CurrentBalance = model.Invoices.Sum(r => r.CurrentBalance);
+
+                _loanRepository.Add(loan);
             }
             catch (Exception ex)
             {
@@ -178,11 +215,29 @@ namespace Project.Service.Services.Implementation
             return result;
         }
 
+        private Invoice InvoiceViewModelToInvoice(InvoiceViewModel invoice)
+        {
+            return new Invoice()
+            {
+                Amount = invoice.Payment,
+                InvoiceDate = DateTime.Now,
+                InvoiceNr = invoice.InvoiceNr,
+                TrDate = DateTime.Now,
+                IsAccepted = true,
+            };
+        }
+
         private Loan CreateInvoiceViewModelToLoan(CreateInvoiceViewModel model)
         {
             return new Loan
             {
-                
+                Amount= decimal.Parse(model.Amount),
+                CurrentBalance= (decimal)model.CurrentBalance,
+                InterestRate = model.Interest,
+                LoanPeriod = model.Period,
+                PayoutDate = DateTime.Parse(model.PayOutDate),
+                PrincipialAmount = (decimal)model.Principal,
+                TrDate = DateTime.Now
             };
         }
     }

@@ -9,6 +9,7 @@ namespace Project.Infrastructure.Repositories.Abstraction
         bool Any(Expression<Func<TEntity, bool>> predicate);
         TEntity Get(Expression<Func<TEntity, bool>> filter);
         Result Add(TEntity item);
+        Result AddRange(ICollection<TEntity> items);
         Result Update(TEntity item);
     }
 }
