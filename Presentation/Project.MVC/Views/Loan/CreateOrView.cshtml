@@ -125,7 +125,7 @@
                   }
                   </section>
                         <div class="card-footer d-flex justify-content-end">
-                            <button class="btn btn-primary mx-3" id="issueLoanBtn" disabled>Issue loan</button>
+                            <a class="btn btn-primary mx-3 disabled" id="issueLoanBtn">Issue loan</a>
                             <a asp-action="Index" class="btn btn-danger" id="cancelBtn" >Cancel</a>
                         </div>
                   </form>
@@ -147,15 +147,13 @@
         const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
         const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
         const payOutInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
-        const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
-        const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
-        const payputDate = '@Model.LoanDetails.PayoutDate';
+        
 
         @if (Model.Id.HasValue)
         {
                 <text>
                 DisableAllFields(phoneInputId,loanAmountInputId,interestRateInputId,payOutInputId)
-                ("#" + loanPayOutDateInputId).value = payputDate
+                InitInputs();
                 </text>
         }
 
@@ -167,6 +165,17 @@
             CalculateAndGetInvoices();
         })
     });
+
+    function InitInputs(){
+
+        const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
+        const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
+
+        const payputDate = '@Model.LoanDetails.PayoutDate';
+        const payputDateFormatted = GetValidJsDateFromFormattedDate(payputDate);
+        console.log(payputDateFormatted)
+        document.getElementById(loanPayOutDateInputId).value = payputDateFormatted;
+    }
 
     function DisableAllFields(phoneInputId,loanAmountInputId,interestRateInputId,payOutInputId) {
         $("#" + phoneInputId).attr('disabled', 'disabled');
@@ -195,6 +204,7 @@
               invoices : invoicesContainer.invoices
          };
 
+         console.log(model)
         if(!ValidateDataForIssueLoan(model)){
              alert("Check the data!");
             return;
@@ -213,7 +223,7 @@
                     return;
                }
 
-              window.location.href = "/Index/";
+              window.href = "/Index";
            } 
          });
     }
@@ -256,7 +266,7 @@
 
                PlaceInvoices(result.data);
 
-               $("#issueLoanBtn").removeAttr("disabled");
+               $("#issueLoanBtn").removeClass("disabled");
 
                invoicesContainer = result.data;
            } 
@@ -323,4 +333,21 @@
 
         invoicesSection.innerHTML = html;
     }
+
+    function GetValidJsDateFromFormattedDate(dateText) {
+
+    const dateSplitted = dateText.split("/")
+
+    const year = dateSplitted[2];
+    const month = dateSplitted[1];
+    const day = dateSplitted[0];
+
+  
+
+    const validDateFormatForJs = year + '-' + month + '-' + day;
+
+    return validDateFormatForJs;
+}
+
+
 </script>

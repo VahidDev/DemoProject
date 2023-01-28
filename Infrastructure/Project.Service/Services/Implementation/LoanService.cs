@@ -203,6 +203,7 @@ namespace Project.Service.Services.Implementation
 
                 loan.PrincipialAmount = model.Invoices.Sum(r => r.Principal);
                 loan.CurrentBalance = model.Invoices.Sum(r => r.CurrentBalance);
+                loan.InterestRate = (double) model.Invoices.Sum(r => r.Interest);
 
                 _loanRepository.Add(loan);
             }
