@@ -147,7 +147,6 @@
         const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
         const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
         const payOutInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
-        
 
         @if (Model.Id.HasValue)
         {
@@ -173,7 +172,6 @@
 
         const payputDate = '@Model.LoanDetails.PayoutDate';
         const payputDateFormatted = GetValidJsDateFromFormattedDate(payputDate);
-        console.log(payputDateFormatted)
         document.getElementById(loanPayOutDateInputId).value = payputDateFormatted;
     }
 
@@ -204,8 +202,7 @@
               invoices : invoicesContainer.invoices
          };
 
-         console.log(model)
-        if (!ValidateAmount(model.amount) {
+        if (!ValidateAmount(model.amount)) {
              alert("Amount date needs to be between 100 and 5000!");
             return;
         }
@@ -228,8 +225,8 @@
          });
     }
 
-     function ValidateAmount(data.amount){
-        return !(amount < 100 || amount > 5000)
+     function ValidateAmount(amount){
+        return !(amount < 100 || amount > 5000);
     }
 
     function CalculateAndGetInvoices() {
@@ -250,6 +247,11 @@
              alert("Fill all the inputs and make sure that they are valid!")
              return;
          }
+
+        if (!ValidateAmount(data.loanAmount)) {
+            alert("Amount date needs to be between 100 and 5000!");
+            return;
+        }
 
          $.ajax
          ({
