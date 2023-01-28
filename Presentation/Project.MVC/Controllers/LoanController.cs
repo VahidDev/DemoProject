@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Project.Service.Services.Abstraction;
 using Project.Service.ViewModels;
-using Project.Service.ViewModels.Invoice;
 
 namespace Project.MVC.Controllers
 {

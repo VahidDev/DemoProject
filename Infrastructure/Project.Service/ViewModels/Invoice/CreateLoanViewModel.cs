@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Project.Service.ViewModels.Invoice
+namespace Project.Service.ViewModels
 {
     public class CreateLoanViewModel
     {
         [Required]
-        public int Client { get; set; }
+        public int ClientId { get; set; }
         [Required]
         public string Phone { get; set; }
         [Required]

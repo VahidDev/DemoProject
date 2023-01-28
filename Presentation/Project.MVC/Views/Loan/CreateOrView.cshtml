@@ -150,10 +150,8 @@
 
         @if (Model.Id.HasValue)
         {
-                <text>
-                DisableAllFields(phoneInputId,loanAmountInputId,interestRateInputId,payOutInputId)
-                InitInputs();
-                </text>
+                @:DisableAllFields(phoneInputId,loanAmountInputId,interestRateInputId,payOutInputId)
+                @:InitInputs();
         }
 
         document.getElementById("issueLoanBtn").addEventListener("click",function(e){
@@ -194,7 +192,7 @@
         const clientInputId = '@Html.IdFor(m=>m.ClientsComboBox)';
 
          let model = {
-              client:  Number($("#clients").val()),
+              clientId:  Number($("#clients").val()),
               phone:    $("#" + phoneInputId).val(),
               amount:  $("#" + loanAmountInputId).val(),
               period:  Number($("#" + loanPeriodInputId).val()),

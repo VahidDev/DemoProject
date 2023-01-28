@@ -1,7 +1,6 @@
 ﻿using Project.Core.Utilities.Results;
 using Project.Infrastructure.SpModels;
 using Project.Service.ViewModels;
-using Project.Service.ViewModels.Invoice;
 
 namespace Project.Service.Services.Abstraction
 {

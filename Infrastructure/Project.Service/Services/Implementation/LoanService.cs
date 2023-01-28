@@ -5,7 +5,7 @@ using Project.Infrastructure.Repositories.Abstraction;
 using Project.Infrastructure.SpModels;
 using Project.Service.Services.Abstraction;
 using Project.Service.ViewModels;
-using Project.Service.ViewModels.Invoice;
+using System.Transactions;
 
 namespace Project.Service.Services.Implementation
 {
@@ -14,15 +14,18 @@ namespace Project.Service.Services.Implementation
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly ILoanRepository _loanRepository;
+        private readonly IClientRepository _clientRepository;
 
         public LoanService(
             IInvoiceRepository invoiceRepository, 
             IOrderRepository orderRepository,
-            ILoanRepository loanRepository)
+            ILoanRepository loanRepository,
+            IClientRepository clientRepository)
         {
             _invoiceRepository = invoiceRepository;
             _orderRepository = orderRepository;
             _loanRepository = loanRepository;
+            _clientRepository = clientRepository;
         }
 
         public Result CalculateInvoices(CalculateInvoicesViewModel model)
@@ -141,7 +144,7 @@ namespace Project.Service.Services.Implementation
             };
 
             var invoices = EfDbTools.ExecuteProcedure<SP_GetInvoice>
-                    ("dbo.SP_GetLoanInvoicesByOrderId", invoicesSpParameters);
+                    ("dbo.SP_GetLoanInvoicesByOrderNr", invoicesSpParameters);
 
             loanDetailsViewModel.Id = loanDetails.Id;
             loanDetailsViewModel.LoanDetails = loanDetails;
@@ -177,35 +180,51 @@ namespace Project.Service.Services.Implementation
                     lastNumber = int.Parse(lastOrder.Value);
                 }
 
+                lastNumber++;
+
+                var client = _clientRepository.Get(r => r.Id == model.ClientId);
+
+                if (client == null)
+                {
+                    result.Success = false;
+                    result.Error = "Client was not found with the id:" + model.ClientId;
+                    return result;
+                }
+
                 var newOrder = new Order() {
                     Amount = decimal.Parse(model.Amount), 
                     OrderDate = DateTime.Now, 
-                    ClientId = model.Client.ToString(),
+                    ClientId = client.ClientUniqueId,
                     OrderNr = GenerateNumber(lastNumber),
                     TrDate= DateTime.Now,
                 };
 
-                _orderRepository.Add(newOrder);
-
-                var loan = CreateInvoiceViewModelToLoan(model);
-                loan.OrderNr = newOrder.OrderNr;
-
-                var invoices = new List<Invoice>();
-
-                foreach (var invoice in model.Invoices)
+                using (var scope = new TransactionScope())
                 {
-                    Invoice newInvoice = InvoiceViewModelToInvoice(invoice);
-                    newInvoice.OrderNr = newOrder.OrderNr;
-                    invoices.Add(newInvoice);
+                    _orderRepository.Add(newOrder);
+
+                    var loan = CreateInvoiceViewModelToLoan(model);
+                    loan.OrderNr = newOrder.OrderNr;
+
+                    var invoices = new List<Invoice>();
+
+                    foreach (var invoice in model.Invoices)
+                    {
+                        Invoice newInvoice = InvoiceViewModelToInvoice(invoice);
+                        newInvoice.OrderNr = newOrder.OrderNr;
+                        invoices.Add(newInvoice);
+                    }
+
+                    _invoiceRepository.AddRange(invoices);
+
+                    loan.PrincipialAmount = model.Invoices.Sum(r => r.Principal);
+                    loan.CurrentBalance = model.Invoices.Sum(r => r.CurrentBalance);
+                    loan.InterestRate = (double)model.Invoices.Sum(r => r.Interest);
+
+                    _loanRepository.Add(loan);
+
+                    scope.Complete();
                 }
-
-                _invoiceRepository.AddRange(invoices);  
-
-                loan.PrincipialAmount = model.Invoices.Sum(r => r.Principal);
-                loan.CurrentBalance = model.Invoices.Sum(r => r.CurrentBalance);
-                loan.InterestRate = (double) model.Invoices.Sum(r => r.Interest);
-
-                _loanRepository.Add(loan);
             }
             catch (Exception ex)
             {

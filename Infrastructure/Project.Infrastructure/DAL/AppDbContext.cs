@@ -59,5 +59,6 @@ namespace Project.Infrastructure.DAL
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Operation> Operations { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Client> Clients { get; set; }
     }
 }

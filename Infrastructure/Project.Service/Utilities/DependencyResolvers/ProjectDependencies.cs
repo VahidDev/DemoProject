@@ -16,6 +16,7 @@ namespace Project.Service.Utilities.DependencyResolvers
             services.AddScoped(typeof(IInvoiceRepository),typeof(InvoiceRepository));
             services.AddScoped(typeof(IOperationRepository),typeof(OperationRepository));
             services.AddScoped(typeof(IOrderRepository),typeof(OrderRepository));
+            services.AddScoped(typeof(IClientRepository),typeof(ClientRepository));
 
 
             // Services
