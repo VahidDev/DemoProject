@@ -1,11 +1,15 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 
 namespace Project.Core.Settings
 {
     public class AppSettings
     {
-        private const string JsonFilePath = "..\\..\\Core\\Project.Core\\Settings\\settings.json";
+        private const string JsonFileName = "settings.json";
+
+        private readonly static string JsonFilePath =  Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Settings",JsonFileName);
+
         public static AppSettings Settings { get; private set; }
         public DbConnectionModel AppDbConnectionModel { get; set; }
 

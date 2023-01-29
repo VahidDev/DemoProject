@@ -4,6 +4,7 @@ using Project.Core.Utilities.Results;
 using Project.Infrastructure.Repositories.Abstraction;
 using Project.Infrastructure.SpModels;
 using Project.Service.Services.Abstraction;
+using Project.Service.Utilities.Calculators;
 using Project.Service.ViewModels;
 using System.Transactions;
 
@@ -48,7 +49,8 @@ namespace Project.Service.Services.Implementation
 
                 var calculatedInvoicesViewModel = new GetCalculatedInvoicesViewModel();
 
-                var totalInterest = CalculateTotalInterest(model.InterestRate,model.LoanPeriod,model.LoanAmount);
+                var totalInterest = InterestCalculator
+                    .CalculateTotalInterest(model.InterestRate,model.LoanPeriod,model.LoanAmount);
 
                 calculatedInvoicesViewModel.TotalInterest = (double)totalInterest;
 
@@ -151,18 +153,14 @@ namespace Project.Service.Services.Implementation
             loanDetailsViewModel.LoanDetails = loanDetails;
             loanDetailsViewModel.Invoices = invoices;
 
-            var totalInterest = CalculateTotalInterest(loanDetailsViewModel.LoanDetails.InterestRate,
+            var totalInterest = InterestCalculator
+                .CalculateTotalInterest(loanDetailsViewModel.LoanDetails.InterestRate,
                                                        loanDetailsViewModel.LoanDetails.LoanPeriod.Value,
                                                        loanDetailsViewModel.LoanDetails.LoanAmount);
 
             loanDetailsViewModel.TotalInterest = Math.Round(totalInterest, 2);
 
             return loanDetailsViewModel;
-        }
-
-        private double CalculateTotalInterest(double interestRate, int loanPeriod, decimal loanAmount)
-        {
-            return (double)((loanAmount * (decimal)interestRate) / 100) * loanPeriod;
         }
 
         public Result IssueLoan(CreateLoanViewModel model)

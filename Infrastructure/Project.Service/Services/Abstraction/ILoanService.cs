@@ -6,10 +6,10 @@ namespace Project.Service.Services.Abstraction
 {
     public interface ILoanService
     {
-        Result CalculateInvoices(CalculateInvoicesViewModel model);
         ICollection<SP_GetLoan> GetAllLoansInfo();
         LoanDetailsViewModel GetLoanDetails(int? id);
         Result IssueLoan(CreateLoanViewModel model);
+        Result CalculateInvoices(CalculateInvoicesViewModel model);
         Result IssueLoanFromExternal(CreateLoanViewModel model);
     }
 }
