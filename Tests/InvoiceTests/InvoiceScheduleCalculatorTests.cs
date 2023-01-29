@@ -8,7 +8,7 @@ namespace InvoiceTests
     public class InvoiceScheduleCalculatorTests
     {
         [Fact]
-        public void CalculateInvoices_ValidInput_ReturnsCorrectResult()
+        public void CalculateInvoices_ReturnsExpectedData_ForValidInput()
         {
             //Arrange
             var invoiceRepositoryMock = new Mock<IInvoiceRepository>();
