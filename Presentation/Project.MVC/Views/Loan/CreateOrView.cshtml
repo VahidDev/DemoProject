@@ -143,13 +143,12 @@
 
     $(document).ready(function () 
     {
-        
-
         @if (Model.Id.HasValue)
         {
                 @:DisableAllFields();
                 @:InitInputs();
-        }else
+        }
+        else
         {
             @:SetEvents();
         }
@@ -166,9 +165,9 @@
     function InitInputs(){
 
         const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
-
         const payoutDate = '@Model.LoanDetails.PayoutDate';
         const payputDateFormatted = GetValidJsDateFromFormattedDate(payoutDate);
+
         document.getElementById(loanPayOutDateInputId).value = payputDateFormatted;
     }
 
