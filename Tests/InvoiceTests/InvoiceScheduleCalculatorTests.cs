@@ -58,7 +58,7 @@ namespace InvoiceTests
         }
 
         [Fact]
-        public void CalculateInvoices_ShouldReturnValidSequentialInvoiceDatesStartingOneMonthAfterPayout()
+        public void CalculateInvoices_ShouldReturnSequentialInvoiceDatesStartingOneMonthAfterPayout()
         {
             //Arrange
             var loanPayoutDate = new DateTime(2022, 01, 01);
