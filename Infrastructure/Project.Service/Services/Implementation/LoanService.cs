@@ -48,8 +48,9 @@ namespace Project.Service.Services.Implementation
 
                 var calculatedInvoicesViewModel = new GetCalculatedInvoicesViewModel();
 
-                var totalInterest = CalculateTotalInterest(model.InterestRate, model.LoanPeriod, model.LoanAmount);
-                calculatedInvoicesViewModel.TotalInterest = Math.Round(totalInterest,2);
+                var totalInterest = CalculateTotalInterest(model.InterestRate,model.LoanPeriod,model.LoanAmount);
+
+                calculatedInvoicesViewModel.TotalInterest = (double)totalInterest;
 
                 var latestInvoice = EfDbTools.ExecuteProcedure<SP_KeyValueResult>
                     ("dbo.SP_GetLastInvoice", null).FirstOrDefault();
@@ -219,7 +220,7 @@ namespace Project.Service.Services.Implementation
 
                     loan.PrincipialAmount = model.Invoices.Sum(r => r.Principal);
                     loan.CurrentBalance = model.Invoices.Sum(r => r.CurrentBalance);
-                    loan.InterestRate = (double)model.Invoices.Sum(r => r.Interest);
+                    loan.InterestRate = model.Interest;
 
                     _loanRepository.Add(loan);
 

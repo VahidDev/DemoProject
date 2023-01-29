@@ -18,7 +18,7 @@
     <div class="container-fluid">
         <!-- Main row -->
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-7">
             <!-- general form elements -->
             <div class="card card-primary">
               <div class="card-header">
@@ -48,7 +48,7 @@
                   </div>
                   <div class="form-group">
                       <label asp-for="LoanDetails.ClientPhone">Telephone number</label>
-                      <input class="form-control" value="@Model.LoanDetails.ClientPhone" asp-for="LoanDetails.ClientPhone">
+                      <input class="form-control" value="@Model.LoanDetails.ClientPhone" asp-for="LoanDetails.ClientPhone" disabled>
                   </div>
                    <div class="form-group">
                        <label asp-for="LoanDetails.LoanAmount">Loan Amount</label>
@@ -75,7 +75,7 @@
                   </div>
                   <div class="form-group">
                       <label asp-for="LoanDetails.InterestRate">Monthly Interest Rate %</label>
-                      <input class="form-control" value="@Model.LoanDetails.LoanAmount" asp-for="LoanDetails.InterestRate">
+                      <input class="form-control" value="@Model.LoanDetails.InterestRate" asp-for="LoanDetails.InterestRate">
                   </div>
                    <div class="form-group">
                        <label asp-for="LoanDetails.PayoutDate">Payout Date</label>
@@ -88,7 +88,7 @@
                 <section id="invocesSection">
                 @if (Model.Id.HasValue)
                 {
-                      <div class="col-md-6 px-2">
+                      <div class="col-md-6 px-4">
                       <label>Invoices:</label>
                        <div class="row">
                            <div class="col-12">
@@ -143,15 +143,15 @@
 
     $(document).ready(function () 
     {
-        const phoneInputId = '@Html.IdFor(m=>m.LoanDetails.ClientPhone)';
-        const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
-        const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
-        const payOutInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
+        
 
         @if (Model.Id.HasValue)
         {
-                @:DisableAllFields(phoneInputId,loanAmountInputId,interestRateInputId,payOutInputId)
+                @:DisableAllFields();
                 @:InitInputs();
+        }else
+        {
+            @:SetEvents();
         }
 
         document.getElementById("issueLoanBtn").addEventListener("click",function(e){
@@ -166,15 +166,53 @@
     function InitInputs(){
 
         const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
-        const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
 
         const payputDate = '@Model.LoanDetails.PayoutDate';
         const payputDateFormatted = GetValidJsDateFromFormattedDate(payputDate);
         document.getElementById(loanPayOutDateInputId).value = payputDateFormatted;
     }
 
-    function DisableAllFields(phoneInputId,loanAmountInputId,interestRateInputId,payOutInputId) {
-        $("#" + phoneInputId).attr('disabled', 'disabled');
+    function SetEvents(){
+
+        document.getElementById("clients").addEventListener('change', function (e) {
+            SetClientPhone(e.target.value);
+        });
+    }
+
+     function SetClientPhone(clientId){
+
+        const clientPhoneInputId = '@Html.IdFor(m=>m.LoanDetails.ClientPhone)';
+
+        if(clientId === '-1'){
+            document.getElementById(clientPhoneInputId).value = "";
+            return;
+        }
+
+         $.ajax
+         ({
+           type: "GET",
+           url: "/Client/GetClientPhone?clientId=" + clientId,
+           success: function(result)
+           {
+               if(result.success === false){
+                   alert("Something went wrong check the data!");
+                    return null;
+               }
+
+               document.getElementById(clientPhoneInputId).value = result.data;
+           },
+           error: function(error)
+           {
+               alert(error)
+           }
+         });
+    }
+
+    function DisableAllFields() {
+        const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
+        const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
+        const payOutInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
+
         $("#" + loanAmountInputId).attr('disabled', 'disabled');
         $("#" + interestRateInputId).attr('disabled', 'disabled');
         $("#" + payOutInputId).attr('disabled', 'disabled');
@@ -187,7 +225,7 @@
         const phoneInputId = '@Html.IdFor(m=>m.LoanDetails.ClientPhone)';
         const interestRateInputId = '@Html.IdFor(m=>m.LoanDetails.InterestRate)';
         const loanAmountInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
-        const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanAmount)';
+        const loanPeriodInputId = '@Html.IdFor(m=>m.LoanDetails.LoanPeriod)';
         const loanPayOutDateInputId = '@Html.IdFor(m=>m.LoanDetails.PayoutDate)';
         const clientInputId = '@Html.IdFor(m=>m.ClientsComboBox)';
 
@@ -197,6 +235,7 @@
               amount:  $("#" + loanAmountInputId).val(),
               period:  Number($("#" + loanPeriodInputId).val()),
               payOutDate:  $("#" + loanPayOutDateInputId).val(),
+              interest:  $("#" + interestRateInputId).val(),
               invoices : invoicesContainer.invoices
          };
 
@@ -219,6 +258,10 @@
                }
 
               window.location.href = "Index/";
+           },
+           error: function(error)
+           {
+               alert(error)
            } 
          });
     }
@@ -260,7 +303,7 @@
            success: function(result)
            {
                if(result.success === false){
-                   alert("Something went wrong ceck the data!");
+                   alert("Something went wrong check the data!");
                     return null;
                }
 
@@ -269,6 +312,10 @@
                $("#issueLoanBtn").removeClass("disabled");
 
                invoicesContainer = result.data;
+           },
+           error: function(error)
+           {
+               alert(error)
            } 
          });
     }
@@ -283,7 +330,7 @@
     function PlaceInvoices(invoicesModel){
 
         const invoicesSection = document.getElementById("invocesSection");
-        let html = `<div class="col-md-6 px-2">
+        let html = `<div class="col-md-6 px-4">
                       <label>Invoices:</label>
                        <div class="row">
                            <div class="col-12">

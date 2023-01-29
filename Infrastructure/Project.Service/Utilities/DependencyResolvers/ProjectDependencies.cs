@@ -21,6 +21,7 @@ namespace Project.Service.Utilities.DependencyResolvers
 
             // Services
             services.AddScoped(typeof(ILoanService), typeof(LoanService));
+            services.AddScoped(typeof(IClientService), typeof(ClientService));
         }
     }
 }
