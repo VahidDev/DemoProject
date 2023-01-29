@@ -1,6 +1,6 @@
 ﻿{
   "AppDbConnectionModel": {
-    "serverName": "DEVMONSTER",
+    "serverName": "localhost",
     "database": "TestProAteshgahDb",
     "username": null,
     "password": null,
