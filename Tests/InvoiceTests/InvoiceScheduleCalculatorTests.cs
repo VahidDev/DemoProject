@@ -88,6 +88,7 @@ namespace InvoiceTests
 
             foreach (var invoice in newInvoices)
             {
+                Assert.True(invoice.PayDate == startPaymentDate);
                 startPaymentDate = startPaymentDate.AddMonths(1);
             }
         }
