@@ -1,7 +1,7 @@
 ﻿{
   "AppDbConnectionModel": {
     "serverName": "localhost",
-    "database": "TestProAteshgahDb",
+    "database": "TestDb",
     "username": null,
     "password": null,
     "trustedConnection": true
