@@ -49,14 +49,5 @@ msbuild.wrn
 # NuGet v3's project.json files produces more ignorable files
 *.nuget.props
 *.nuget.targets
-
-/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/login.min.js
-/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/ui.min.js
-/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/jquery.min.js
-/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/login.bundle.js
-/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/ui.bundle.js
-/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/jquery.bundle.js
-/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/js/site.min.js
-/EBSS.Web/EBSS.Web.CIM/wwwroot/Content/css/stylesmin.css
 wwwroot/js/*.min.js
-/EBSS.Web/EBSS.Web.CIM/wwwroot/js/*.bundle.js
+
